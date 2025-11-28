@@ -1,3 +1,11 @@
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_chroma import Chroma
+from langchain_core.prompts import PromptTemplate
+from langchain.tools import tool
+from langchain_classic.chains.retrieval import create_retrieval_chain
+from langchain_classic.chains.combine_documents import create_stuff_documents_chain
+from langchain_core.prompts import ChatPromptTemplate
+
 from config import settings
 from llm.models import QwenLLM
 
@@ -61,3 +69,31 @@ class GeneratingLLM(BaseLLM):
             prompt=message,
             system_prompt=self.SYSTEM_PROMPT.format(mail_class=mail_class)
         )
+
+
+class DocLLM:
+    def __init__(self, vectordb):
+        self.llm = QwenLLM(
+            folder_id = settings.MODEL_FOLDER_ID,
+            api_key = settings.MODEL_API_KEY
+        )
+        self.system_prompt = """
+Используй предоставленный контекст, чтобы ответить на вопрос:
+{context}
+
+Формат ответа: JSON с полями:
+- "docs": строка
+"""
+        self.prompt = ChatPromptTemplate.from_messages([
+            ("system", self.system_prompt),
+            ("human", "{input}"),
+        ])
+
+        self.document_chain = create_stuff_documents_chain(self.llm, self.prompt)
+
+        self.retriever = vectordb.as_retriever()
+        self.retrieval_chain = create_retrieval_chain(self.retriever, self.document_chain)
+
+
+    def invoke_message(self, message: str):
+        return self.retrieval_chain.invoke({"input": message})

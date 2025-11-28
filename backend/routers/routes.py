@@ -1,11 +1,15 @@
 from fastapi import APIRouter, HTTPException
 
-from llm.llm import AnalysisLLM, ClassifierLLM, GeneratingLLM
-from llm.models import AnalysisResponseFormat, ClassifierResponseFormat, GeneratingResponseFormat
+from llm.llm import AnalysisLLM, ClassifierLLM, GeneratingLLM, DocLLM
+from llm.rag import DocumentProcessor
+from llm.models import AnalysisResponseFormat, ClassifierResponseFormat, GeneratingResponseFormat, DocumentResponseFormat
+
+processor = DocumentProcessor().process_all_documents()
 
 allm = AnalysisLLM()
 cllm = ClassifierLLM()
 gllm = GeneratingLLM()
+dllm = DocLLM(processor)
 
 api_router = APIRouter()
 
@@ -18,6 +22,22 @@ async def analysis(mail: str):
 @api_router.get("/classifier")
 async def classifier(mail: str):
     return ClassifierResponseFormat.model_validate_json(cllm.invoke_message(message=mail))
+
+
+@api_router.get("/documents")
+async def documents(mail: str):
+    response = dllm.invoke_message(message=mail)
+    # return response
+    result = []
+    for doc in response['context']:
+        curr_res = {}
+        curr_res['document_type'] = doc.metadata['document_type']
+        curr_res['source'] = doc.metadata['source']
+        curr_res['content'] = doc.page_content
+        result.append(curr_res)
+    return {
+        'docs': result
+    }
 
 
 @api_router.get("/generate")

@@ -1,2 +1,4 @@
 /venv
 .env
+/llm/docs
+/llm/chroma_db

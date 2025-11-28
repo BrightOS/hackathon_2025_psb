@@ -17,6 +17,10 @@ class GeneratingResponseFormat(BaseModel):
     mail: str = Field(description="Ответное письмо в нужном формате")
 
 
+class DocumentResponseFormat(BaseModel):
+    docs: str = Field(description="Выжимки из документов")
+
+
 class QwenLLM(LLM):
     folder_id: str = ""
     api_key: str = ""

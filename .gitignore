@@ -4,6 +4,7 @@
 /.mongodb
 /.ssh
 /.vscode-server
+/nltk_data
 .bash_history
 .bash_logout
 .bashrc
