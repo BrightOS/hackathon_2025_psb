@@ -64,6 +64,7 @@ jsonschema-specifications==2025.9.1
 jupyter_client==8.6.3
 jupyter_core==5.9.1
 jupyterlab_pygments==0.3.0
+kafka-python==2.3.0
 kubernetes==34.1.0
 langchain==1.1.0
 langchain-chroma==1.0.0
