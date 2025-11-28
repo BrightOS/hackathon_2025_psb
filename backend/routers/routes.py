@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException
 from llm.llm import AnalysisLLM, ClassifierLLM, GeneratingLLM, DocLLM
 from llm.rag import DocumentProcessor
 from llm.models import AnalysisResponseFormat, ClassifierResponseFormat, GeneratingResponseFormat, DocumentResponseFormat
+from kafka import KafkaProducer, KafkaConsumer
 
 processor = DocumentProcessor().process_all_documents()
 
@@ -39,6 +40,18 @@ async def documents(mail: str):
         'docs': result
     }
 
+@api_router.get("/send")
+async def generate(mail: str, id: str):
+    key_bytes = bytes(id, encoding='utf-8') 
+    value_bytes = bytes(mail, encoding='utf-8') 
+
+    producer_tosend = KafkaProducer(
+        bootstrap_servers='0.0.0.0:9092')
+    
+    producer_tosend.send('some_topic', key=key_bytes, value=value_bytes) 
+    producer_tosend.flush() 
+
+    return "sended"
 
 @api_router.get("/generate")
 async def generate(mail: str, mail_class: str):
