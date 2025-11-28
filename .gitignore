@@ -9,5 +9,6 @@
 .bashrc
 .profile
 .wget-hsts
+.gitconfig
 authorized_keys
 __pycache__
