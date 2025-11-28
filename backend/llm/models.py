@@ -17,8 +17,42 @@ class GeneratingResponseFormat(BaseModel):
     mail: str = Field(description="Ответное письмо в нужном формате")
 
 
+class DocumentPartResponseFormat(BaseModel):
+    document_type: str = Field(description="Тип документа")
+    source: str = Field(description="Файл-источник")
+    content: str = Field(description="Содержимое документа")
+
+
 class DocumentResponseFormat(BaseModel):
-    docs: str = Field(description="Выжимки из документов")
+    docs: List[DocumentPartResponseFormat] = Field(description="Выжимки из документов")
+
+
+class HelperResponseFormat(BaseModel):
+    mail_class: str = Field(description="Название класса письма")
+    summary: str = Field(description="Краткое содержание текста")
+    contacts: str = Field(description="Информация о контактах: email, телефон, имя и т.д.")
+    new_mail: str = Field(description="Ответное письмо в нужном формате")
+    docs: List[DocumentPartResponseFormat] = Field(description="Выжимки из документов")
+    count_mails: int
+
+
+    @classmethod
+    def from_all_formats(
+        cls,
+        a: ClassifierResponseFormat,
+        c: AnalysisResponseFormat,
+        g: GeneratingResponseFormat,
+        d: DocumentResponseFormat,
+        count_mails: int
+    ):
+        return HelperResponseFormat(
+            mail_class=a.mail_class,
+            summary=c.summary,
+            contacts=c.contacts,
+            new_mail=g.mail,
+            docs=d.docs,
+            count_mails=count_mails
+        )
 
 
 class QwenLLM(LLM):

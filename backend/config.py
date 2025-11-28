@@ -6,6 +6,10 @@ class Settings(BaseSettings):
     MODEL_FOLDER_ID: str = ""
     MODEL_API_ID: str = ""
     MODEL_API_KEY: str = ""
+    MONGO_HOST: str = ""
+    MONGO_PORT: str = ""
+    MONGO_USER: str = ""
+    MONGO_PASS: str = ""
 
     class Config:
         env_file = ".env"

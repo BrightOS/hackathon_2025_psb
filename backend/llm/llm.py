@@ -19,10 +19,10 @@ class BaseLLM:
             api_key = settings.MODEL_API_KEY
         )
 
-    def invoke_message(self, message: str) -> str:
+    def invoke_message(self, message: str, prev: str) -> str:
         return self.llm._call(
             prompt=message,
-            system_prompt=self.SYSTEM_PROMPT
+            system_prompt=self.SYSTEM_PROMPT.format(prev=prev)
         )
 
 class ClassifierLLM(BaseLLM):
@@ -37,8 +37,14 @@ class ClassifierLLM(BaseLLM):
 - Запрос на согласование
 - Уведомление или информирование
 
+Обязательно учти предыдущие сообщения от данного пользователя.
+Для контекста переписки данные сообщения предоставляются:
+{prev}
+
 Формат ответа: JSON с полями:
 - "mail_class": строка, строго такая же как и в названиях классов
+
+Следование формату ответа СТРОГО ОБЯЗАТЕЛЬНО
 """
 
 
@@ -47,9 +53,15 @@ class AnalysisLLM(BaseLLM):
 Ты - ИИ-ассистент по обработки корреспонденции для крупного банка.
 В твои задачи входит извлечение информации из письма, подготовка краткой выжимки и извлечение контактов.
 
+Обязательно учти предыдущие сообщения от данного пользователя.
+Для контекста переписки данные сообщения предоставляются:
+{prev}
+
 Формат ответа: JSON с полями:
 - "summary": строка
 - "contacts": строка
+
+Следование формату ответа СТРОГО ОБЯЗАТЕЛЬНО
 """
 
 
@@ -58,16 +70,22 @@ class GeneratingLLM(BaseLLM):
 Ты - ИИ-ассистент по обработки корреспонденции для крупного банка.
 В твои задачи входит составление ответа на полученное письмо.
 Важно соблюсти нужный стиль в зависимости от того, к какому классу относится письмо.
-Класс письма - {mail_class}.
+Класс письма - {mail_class}. Учти, что письма разных классов нужно писать в разном стиле.
+
+Обязательно учти предыдущие сообщения от данного пользователя.
+Для контекста переписки данные сообщения предоставляются:
+{prev}
 
 Формат ответа: JSON с полями:
 - "mail": строка
+
+Следование формату ответа СТРОГО ОБЯЗАТЕЛЬНО
 """
 
-    def invoke_message(self, message: str, mail_class: str) -> str:
+    def invoke_message(self, message: str, mail_class: str, prev: str) -> str:
         return self.llm._call(
             prompt=message,
-            system_prompt=self.SYSTEM_PROMPT.format(mail_class=mail_class)
+            system_prompt=self.SYSTEM_PROMPT.format(mail_class=mail_class, prev=prev)
         )
 
 
@@ -83,6 +101,8 @@ class DocLLM:
 
 Формат ответа: JSON с полями:
 - "docs": строка
+
+Следование формату ответа СТРОГО ОБЯЗАТЕЛЬНО
 """
         self.prompt = ChatPromptTemplate.from_messages([
             ("system", self.system_prompt),
