@@ -1,0 +1,13 @@
+/.cache
+/.dotnet
+/.local
+/.mongodb
+/.ssh
+/.vscode-server
+.bash_history
+.bash_logout
+.bashrc
+.profile
+.wget-hsts
+authorized_keys
+__pycache__
