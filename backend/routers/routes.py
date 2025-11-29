@@ -8,10 +8,11 @@ from llm.models import AnalysisResponseFormat, ClassifierResponseFormat, Generat
 from db.mongo import MongoManager
 from db.model import DBEmailModel
 
-from prometheus_client import Counter, Histogram, generate_latest, REGISTRY
+from prometheus_client import Counter, Histogram, generate_latest, REGISTRY, Gauge
 from fastapi.responses import Response
 
-LIKE_REQUESTS = Counter('likes_total', 'Total number of like requests')
+LIKE_REQUESTS = Gauge('only_likes_req', 'Total number of like requests')
+TOTAL_REQUESTS = Counter('total_req_sum', 'Total number of like requests')
 
 processor = DocumentProcessor().process_all_documents()
 
@@ -25,6 +26,7 @@ mongo_manager = MongoManager()
 api_router = APIRouter()
 
 # prometheus-client==0.19.0
+# prometheus-client==0.19.0
 @api_router.get("/metrics")
 async def metrics():
     return Response(
@@ -34,8 +36,14 @@ async def metrics():
 
 @api_router.get("/like")
 async def like():
+    TOTAL_REQUESTS.inc()
     LIKE_REQUESTS.inc()
-    return "sended"
+    return "sended like"
+
+@api_router.get("/dislike")
+async def dislike():
+    TOTAL_REQUESTS.inc()
+    return "sended dis"
 
 @api_router.get("/analysis", response_model = AnalysisResponseFormat)
 async def analysis(sendler: str, mail: str):
