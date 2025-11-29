@@ -1,6 +1,6 @@
 from kafka import KafkaProducer, KafkaConsumer
 
-consumer_toget = KafkaConsumer('some_topic',bootstrap_servers='localhost:9092')
+consumer_toget = KafkaConsumer('topic_1', bootstrap_servers='localhost:9092')
 
 for msg in consumer_toget:
     print(msg)

@@ -71,18 +71,18 @@ async def documents(sendler: str, mail: str):
     }
     return DocumentResponseFormat.model_validate(docs)
 
-@api_router.get("/send")
-async def send(mail: str, id: str):
-    key_bytes = bytes(id, encoding='utf-8') 
-    value_bytes = bytes(mail, encoding='utf-8') 
+@api_router.post("/send")
+async def send(mail: str, id: str, topic_id: int):
+    key_bytes = bytes(id, encoding='utf-8')
+    value_bytes = bytes(mail, encoding='utf-8')
 
-    producer_tosend = KafkaProducer(
-        bootstrap_servers='0.0.0.0:9092')
+    producer_tosend = KafkaProducer(bootstrap_servers='0.0.0.0:9092')
     
-    producer_tosend.send('some_topic', key=key_bytes, value=value_bytes) 
+    producer_tosend.send(f'topic_{topic_id}', key=key_bytes, value=value_bytes) 
     producer_tosend.flush() 
 
-    return "sended"
+    return f"sended to topic_{topic_id}"
+
 
 @api_router.get("/generate", response_model = GeneratingResponseFormat)
 async def generate(sendler: str, mail: str, mail_class: str):
