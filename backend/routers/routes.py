@@ -25,7 +25,7 @@ mongo_manager = MongoManager()
 api_router = APIRouter()
 
 # prometheus-client==0.19.0
-@app.get("/metrics")
+@api_router.get("/metrics")
 async def metrics():
     return Response(
         content=generate_latest(REGISTRY),
@@ -33,10 +33,9 @@ async def metrics():
     )
 
 @api_router.get("/like")
-async def send(mail: str, id: str):
+async def like():
     LIKE_REQUESTS.inc()
     return "sended"
-
 
 @api_router.get("/analysis", response_model = AnalysisResponseFormat)
 async def analysis(sendler: str, mail: str):
